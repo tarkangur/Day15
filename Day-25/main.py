@@ -12,9 +12,9 @@
 #             temperatures.append(int(row[1]))
 #     print(temperatures)
 
-import pandas
-
-data = pandas.read_csv("weather_data.csv")
+# import pandas
+#
+# data = pandas.read_csv("weather_data.csv")
 # # print(data["temp"])
 #
 # data_dict = data.to_dict()
@@ -38,9 +38,24 @@ data = pandas.read_csv("weather_data.csv")
 # fahrenheit_monday = monday.temp[0] * 9/5 + 32
 # print(fahrenheit_monday)
 
-data_dict = {
-    "students": ["Amy", "James", "Angela"],
-    "scores": [76, 56, 65]
+# data_dict = {
+#     "students": ["Amy", "James", "Angela"],
+#     "scores": [76, 56, 65]
+# }
+# data = pandas.DataFrame(data_dict)
+# data.to_csv("new_data.csv")
+
+import pandas
+
+data = pandas.read_csv("2018_Central_Park_Squirrel_Census_-_Squirrel_Data.csv")
+colors = data["Primary Fur Color"].to_list()
+Gray = colors.count("Gray")
+Red = colors.count("Cinnamon")
+Black = colors.count("Black")
+squirrel_count_dict = {
+    "Fur Color": ["Gray", "Cinnamon", "Black"],
+    "Count": [Gray, Red, Black]
 }
-data = pandas.DataFrame(data_dict)
-data.to_csv("new_data.csv")
+df = pandas.DataFrame(squirrel_count_dict)
+df.to_csv("squirrel_count.csv")
+
