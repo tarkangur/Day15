@@ -16,9 +16,8 @@ answers = []
 score = 0
 game_is_on = True
 while game_is_on:
-    answer = screen.textinput(title=f"{score}/50 States Correct", prompt="What's another state's name?")
-    if answer is None:
-        game_is_on = False
+    answer = screen.textinput(title=f"{score}/50 States Correct", prompt="What's another state's name?").title()
+    
     if answer in states and answer not in answers:
         index = states.index(answer)
         correct = data[data.state == answer]
