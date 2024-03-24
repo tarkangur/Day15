@@ -4,13 +4,13 @@ import pandas
 
 BACKGROUND_COLOR = "#B1DDC6"
 current_card = {}
-word_dict = {}
+words_dict = {}
 
 try:
     data = pandas.read_csv("data/words_to_learn.csv")
 except FileNotFoundError:
     original_data = pandas.read_csv("data/english_words.csv")
-    word_dict = original_data.to_dict(orient="records")
+    words_dict = original_data.to_dict(orient="records")
 else:
     words_dict = data.to_dict(orient="records")
 
@@ -34,7 +34,7 @@ def flip_card():
 def right_word():
     words_dict.remove(current_card)
     data = pandas.DataFrame(words_dict)
-    data.to.csv("data/words_to_learn.csv", index=False)
+    data.to_csv("data/words_to_learn.csv", index=False)
     next_card()
 
 
