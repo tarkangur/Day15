@@ -3,8 +3,8 @@ import pandas
 import random
 import smtplib
 
-EMAIL = "d41913970@gmail.com"
-PASSWORD = "phbasfovtikzwyds"
+EMAIL = ""
+PASSWORD = ""
 
 now = dt.datetime.now()
 now_month = now.month
