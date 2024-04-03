@@ -21,9 +21,8 @@ stock_parameters = {
     "extended_hours": "false"
 }
 r = requests.get(url=STOCK_ENDPOINT, params=stock_parameters)
-stock_data = r.json()
+stock_data = r.json()["Time Series (Daily)"]
 stock_data_list = [value for (key, value) in stock_data.items()]
-
 yesterday_data = stock_data_list[0]
 day_before_yesterday_data = stock_data_list[1]
 
@@ -55,6 +54,6 @@ for i in range(3):
     message = client.messages \
                     .create(
                         body=f"{STOCK}: {up_down}{diff_percent:.2f}%\nHeadline:{headline}\nBrief:{brief}",
-                        from_='+12052360362',
-                        to='+905054506333'
+                        from_='2',
+                        to=''
                      )
