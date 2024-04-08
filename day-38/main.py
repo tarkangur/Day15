@@ -1,13 +1,13 @@
 import requests
 from datetime import datetime
 
-GENDER = ""
-WEIGHT_KG = 
-HEIGHT_CM = 
-AGE = 
+GENDER = "male"
+WEIGHT_KG = 73
+HEIGHT_CM = 184
+AGE = 26
 
-APP_ID = ""
-API_KEY = ""
+APP_ID = "e210ba46"
+API_KEY = "0d4be2888187361f905c94dc36a90a01"
 
 exercise_endpoint = "https://trackapi.nutritionix.com/v2/natural/exercise"
 sheety_endpoint = "https://api.sheety.co/eedae3a1e65a54bcf482a3f548a4aa60/myWorkouts/workouts"
@@ -18,7 +18,7 @@ headers = {
     "x-app-id": APP_ID,
     "x-app-key": API_KEY
 }
-params ={
+params = {
     "query": exercise_text,
     "gender": GENDER,
     "weight_kg": WEIGHT_KG,
@@ -29,22 +29,21 @@ params ={
 
 response = requests.post(url=exercise_endpoint, json=params, headers=headers)
 result = response.json()
+print(len(result))
+print(result)
 
-for index in range(len(result)+1):
-    exercise = result["exercises"][index]["name"]
-    duration = result["exercises"][index]["duration_min"]
-    calories = result["exercises"][index]["nf_calories"]
+for exercise in result["exercises"]:
     today = datetime.now()
     date_string = today.strftime("%d/%m/%Y")
     time_string = today.strftime("%H:%M:%S")
     data_for_sheet = {
         "workout": {
-            "Date": date_string,
-            "Time": time_string,
-            "Exercise": exercise,
-            "Duration": duration,
-            "Calories": calories
+            "date": date_string,
+            "time": time_string,
+            "exercise": exercise["name"].title(),
+            "duration": exercise["duration_min"],
+            "calories": exercise["nf_calories"]
         }
     }
-    response = requests.post(url=sheety_endpoint, json=data_for_sheet)
-    response.raise_for_status()
+    sheet_response = requests.post(url=sheety_endpoint, json=data_for_sheet)
+    print(sheet_response.text)
