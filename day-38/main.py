@@ -1,13 +1,13 @@
 import requests
 from datetime import datetime
 
-GENDER = "male"
-WEIGHT_KG = 73
-HEIGHT_CM = 184
-AGE = 26
+GENDER = ""
+WEIGHT_KG = 
+HEIGHT_CM = 
+AGE = 
 
-APP_ID = "e210ba46"
-API_KEY = "0d4be2888187361f905c94dc36a90a01"
+APP_ID = ""
+API_KEY = ""
 
 exercise_endpoint = "https://trackapi.nutritionix.com/v2/natural/exercise"
 sheety_endpoint = "https://api.sheety.co/eedae3a1e65a54bcf482a3f548a4aa60/myWorkouts/workouts"
