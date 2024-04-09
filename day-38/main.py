@@ -25,12 +25,12 @@ params = {
     "height_cm": HEIGHT_CM,
     "age": AGE
 }
-
+bearer_headers = {
+    "Authorization": ""
+}
 
 response = requests.post(url=exercise_endpoint, json=params, headers=headers)
 result = response.json()
-print(len(result))
-print(result)
 
 for exercise in result["exercises"]:
     today = datetime.now()
@@ -45,5 +45,5 @@ for exercise in result["exercises"]:
             "calories": exercise["nf_calories"]
         }
     }
-    sheet_response = requests.post(url=sheety_endpoint, json=data_for_sheet)
+    sheet_response = requests.post(url=sheety_endpoint, json=data_for_sheet, headers=bearer_headers)
     print(sheet_response.text)
