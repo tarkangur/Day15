@@ -1,24 +1,31 @@
 import requests
-from twilio.rest import Client
+
+sheet_endpoint = ""
+sheet_header = {
+    "Authorization": "Bearer "
+}
 
 
 class DataManager:
 
-    sheet_endpoint = ""
-    sheet_header = {
-        "Authorization": ""
-    }
-    account_sid = ""
-    auth_token = ""
-    client = Client(account_sid, auth_token)
-
     def __init__(self):
-        self.data = requests.get(url=self.sheet_endpoint, headers=self.sheet_header)
+        self.destination_data = {}
 
-    def write_message(self):
-        message = self.client.messages \
-                .create(
-                     body="",
-                     from_='+12052360362',
-                     to=''
-                 )
+    def get_destination_data(self):
+        response = requests.get(url=sheet_endpoint, headers=sheet_header)
+        data = response.json()
+        self.destination_data = data["prices"]
+        return self.destination_data
+
+    def update_destination_code(self):
+        for city in self.destination_data:
+            new_data = {
+                "price": {
+                    "iataCode": city["iataCode"]
+                }
+            }
+            response = requests.put(
+                url=f"{sheet_endpoint}/{city['id']}",
+                json=new_data,
+                headers=sheet_header
+            )
