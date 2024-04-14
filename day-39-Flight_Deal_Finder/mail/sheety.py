@@ -1,8 +1,9 @@
 import os
 import requests
 
-sheet_endpoint = ""
-sheet_token = ""
+sheet_id = os.getenv("sheet_id")
+sheet_token = os.getenv("sheet_token")
+sheet_endpoint = f"https://api.sheety.co/{sheet_id}/flightDeals/users"
 
 
 def post_new_row(name, lastname, email):
