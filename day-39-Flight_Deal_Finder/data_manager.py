@@ -10,6 +10,7 @@ class DataManager:
 
     def __init__(self):
         self.destination_data = {}
+        self.customer_data = []
 
     def get_destination_data(self):
         response = requests.get(url=sheet_endpoint, headers=sheet_header)
@@ -25,7 +26,16 @@ class DataManager:
                 }
             }
             response = requests.put(
-                url=f"{sheet_endpoint}/{city['id']}",
+                url=f"{sheet_endpoint}prices/{city['id']}",
                 json=new_data,
                 headers=sheet_header
             )
+            print(response.text)
+
+    def get_customer_emails(self):
+        response = requests.get(
+            url="",
+            headers=sheet_header
+        )
+        self.customer_data = response.json()["users"]
+        return self.customer_data
