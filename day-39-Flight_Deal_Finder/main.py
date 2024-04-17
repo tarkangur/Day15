@@ -38,11 +38,19 @@ for destination_code in destination:
         continue
 
     if flight.price < destination[destination_code]["price"]:
-            message = f"Low price alert! Only £{flight.price} to fly from {flight.origin_city}-{flight.origin_airport} to {flight.destination_city}-{flight.destination_airport}, from {flight.out_date} to {flight.return_date}"
 
-            if flight.stop_overs > 0:
-                message += f"\n Flight has {flight.stop_overs} stop over, via {flight.via_city}"
-                print(message)
+        users = data_manager.get_customer_emails()
+        emails = [row["email"] for row in users]
+        names = [row["firstName"] for row in users]
 
-            notification_manager.write_message(message)
+        message = (f"Low price alert! Only £{flight.price} to fly from {flight.origin_city}-{flight.origin_airport} to "
+                   f"{flight.destination_city}-{flight.destination_airport}, from {flight.out_date} "
+                   f"to {flight.return_date}")
+
+        if flight.stop_overs > 0:
+            message += f"\n Flight has {flight.stop_overs} stop over, via {flight.via_city}"
+            print(message)
+
+        # notification_manager.send_sms(message)
+        notification_manager.send_emails(message, emails)
 
