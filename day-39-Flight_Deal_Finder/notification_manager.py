@@ -4,7 +4,7 @@ import smtplib
 account_sid = ""
 auth_token = ""
 my_email = ""
-password = "s"
+password = ""
 
 
 class NotificationManager:
@@ -16,8 +16,8 @@ class NotificationManager:
         message = self.client.messages \
             .create(
                 body=message,
-                from_='+12052360362',
-                to='+905054506333'
+                from_='',
+                to=''
             )
         print(message.sid)
 
