@@ -10,7 +10,6 @@ class DataManager:
 
     def __init__(self):
         self.destination_data = {}
-        self.customer_data = []
 
     def get_destination_data(self):
         response = requests.get(url=sheet_endpoint, headers=sheet_header)
@@ -34,7 +33,7 @@ class DataManager:
 
     def get_customer_emails(self):
         response = requests.get(
-            url="",
+            url="https://api.sheety.co/eedae3a1e65a54bcf482a3f548a4aa60/flightDeals/users",
             headers=sheet_header
         )
         self.customer_data = response.json()["users"]
