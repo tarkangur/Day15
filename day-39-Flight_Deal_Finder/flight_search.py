@@ -45,7 +45,7 @@ class FlightSearch:
         try:
             data = response.json()["data"][0]
         except IndexError:
-            query["max_stopovers"] = 1
+            query["max_stopovers"] = 2
             response = requests.get(
                 url=search_endpoint,
                 headers=headers,
