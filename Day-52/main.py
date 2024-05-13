@@ -50,14 +50,19 @@ class InstaFollower:
             time.sleep(2)
 
     def follow(self):
-        follow_buttons = self.driver.find_elements(By.CSS_SELECTOR, value="._ap30 button")
+        follow_buttons = []
+        for i in range(2, 20):
+            follow_button = self.driver.find_elements(By.XPATH, value=f"/html/body/div[6]/div[1]/div/div[2]/div/div"
+                                                                      f"/div/div/div[2]/div/div/div[3]/div[1]/div"
+                                                                      f"/div[{i}]/div/div/div/div[3]/div/button")[0]
+            follow_buttons.append(follow_button)
 
         for follow in follow_buttons:
             try:
                 follow.click()
                 time.sleep(2)
             except ElementClickInterceptedException:
-                cancel_button = self.driver.find_element(By.CSS_SELECTOR, value="._a9_1 button")
+                cancel_button = self.driver.find_element(by=By.XPATH, value="//button[contains(text(), 'İptal')]")
                 cancel_button.click()
 
 
