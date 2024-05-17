@@ -1,0 +1,42 @@
+import random
+from flask import Flask
+
+random_number = random.randint(0, 9)
+app = Flask(__name__)
+
+
+def guess_number(fn):
+    def wrapper(number):
+        if number == fn(number):
+            return (f'<h1>You founded me</h1>'
+                    f'<img src="https://media.giphy.com/media/4T7e4DmcrP9du/giphy.gif">')
+        elif number < fn(number):
+            return (f'<h1>Too low, try again!</h1>'
+                    f'https://media.giphy.com/media/jD4DwBtqPXRXa/giphy.gif')
+        elif number > fn(number):
+            return (f'<h1>Too high, try again!</h1>'
+                    f'https://media.giphy.com/media/3o6ZtaO9BZHcOjmErm/giphy.gif')
+    return wrapper
+
+
+@app.route("/")
+def main():
+    return (f'<h1>Guess a number between 0 and 9</h1>'
+            f'<img src="https://media.giphy.com/media/3o7aCSPqXE5C6T8tBC/giphy.gif">')
+
+
+@app.route("/<int:guess>")
+def guess(guess):
+    if guess == random_number:
+        return (f'<h1>You founded me</h1>'
+                f'<img src="https://media.giphy.com/media/4T7e4DmcrP9du/giphy.gif">')
+    elif guess < random_number:
+        return (f'<h1>Too low, try again!</h1>'
+                f'<img src=https://media.giphy.com/media/jD4DwBtqPXRXa/giphy.gif>')
+    elif guess > random_number:
+        return (f'<h1>Too high, try again!</h1>'
+                f'<img src=https://media.giphy.com/media/3o6ZtaO9BZHcOjmErm/giphy.gif>')
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
