@@ -1,9 +1,13 @@
 from flask import Flask, render_template, request
 import requests
+import smtplib
+import os
 
 # USE YOUR OWN npoint LINK! ADD AN IMAGE URL FOR YOUR POST. 👇
-posts = requests.get("https://api.npoint.io/c790b4d5cab58020d391").json()
+posts = requests.get("https://api.npoint.io/674f5423f73deab1e9a7").json()
 
+E_MAIL = os.environ["mail"]
+PASSWORD = os.environ["password"]
 app = Flask(__name__)
 
 
@@ -21,12 +25,19 @@ def about():
 def contact():
     if request.method == "POST":
         data = request.form
-        print(data["name"])
-        print(data["email"])
-        print(data["phone"])
-        print(data["message"])
-        return "<h1>Successfully sent your message</h1>"
-    return render_template("contact.html")
+        send_email(data["name"], data["email"], data["phone"], data["message"])
+        return render_template("contact.html", msg_sent=True)
+    return render_template("contact.html", msg_sent=False)
+
+
+def send_email(name, email, phone, message,):
+    email_message = f"Subject:New Message\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage:{message}"
+    with smtplib.SMTP(host="smtp.gmail.com", port=587) as connection:
+        connection.starttls()
+        connection.login(user=E_MAIL, password=PASSWORD)
+        connection.send_message(from_addr=E_MAIL,
+                                to_addrs=E_MAIL,
+                                msg=email_message)
 
 
 @app.route("/post/<int:index>")
