@@ -59,7 +59,7 @@ def edit(number):
     return render_template("edit.html", book=book)
 
 
-@app.route("/delete")
+@app.route("/delete<number>")
 def delete(number):
     book_id = number
     book_to_delete = db.session.execute(db.select(Book).where(Book.id == book_id)).scalar()
