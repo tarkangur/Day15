@@ -6,7 +6,10 @@ from sqlalchemy import Integer, String, Float
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField
 from wtforms.validators import DataRequired
+import os
 import requests
+
+API_KEY = os.environ["api_key"]
 
 
 class Base(DeclarativeBase):
@@ -29,9 +32,9 @@ class Movie(db.Model):
     title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
     year: Mapped[int] = mapped_column(Integer, nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
-    rating: Mapped[float] = mapped_column(Float, nullable=False)
-    ranking: Mapped[int] = mapped_column(Integer, nullable=False)
-    review: Mapped[str] = mapped_column(String(250), nullable=False)
+    rating: Mapped[float] = mapped_column(Float, nullable=True)
+    ranking: Mapped[int] = mapped_column(Integer, nullable=True)
+    review: Mapped[str] = mapped_column(String(250), nullable=True)
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
 
@@ -71,7 +74,7 @@ def edit():
 
 
 @app.route("/delete")
-def delete():
+def delete_movie():
     movie_id = request.args.get('id')
     movie = db.get_or_404(Movie, movie_id)
     db.session.delete(movie)
@@ -83,9 +86,33 @@ def delete():
 def add():
     form = EditAdd()
     if form.validate_on_submit():
-        return redirect(url_for('home'))
+        movie_title = form.data["title"]
+        url = "https://api.themoviedb.org/3/search/movie"
+        response = requests.get(url, params={"api_key": API_KEY, "query": movie_title})
+        movies = response.json()["results"]
+        return render_template("select.html", movies=movies)
 
     return render_template("add.html", form=form)
+
+
+@app.route("/select", methods=["GET", "POST"])
+def select_movie():
+    form = EditForm()
+    movie_api_id = request.args.get("id")
+    new_movie_url = f"https://api.themoviedb.org/3/movie/{movie_api_id}"
+    response = requests.get(new_movie_url, params={"api_key": API_KEY, "append_to_response": "title, poster_path, "
+                                                                                             "release_date, overview"})
+    data = response.json()
+    new_movie = Movie(
+        title=data["title"],
+        description=data["overview"],
+        img_url=f"https://image.tmdb.org/t/p/original{data["poster_path"]}",
+        year=data["release_date"].split("-")[0]
+    )
+    db.session.add(new_movie)
+    db.session.commit()
+
+    return redirect(url_for('edit', id=new_movie.id))
 
 
 if __name__ == '__main__':
