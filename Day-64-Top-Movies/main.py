@@ -55,8 +55,13 @@ class EditAdd(FlaskForm):
 
 @app.route("/")
 def home():
-    movies = db.session.execute(db.select(Movie).order_by(Movie.id)).scalars()
-    return render_template("index.html", movies=movies)
+    result = db.session.execute(db.select(Movie).order_by(Movie.rating))
+    all_movies = result.scalars().all()
+    for movie in all_movies:
+        reverse_all_movies = all_movies[::-1]
+        movie.ranking = reverse_all_movies.index(movie) + 1
+        db.session.commit()
+    return render_template("index.html", movies=all_movies)
 
 
 @app.route("/edit", methods=["GET", "POST"])
@@ -97,7 +102,6 @@ def add():
 
 @app.route("/select", methods=["GET", "POST"])
 def select_movie():
-    form = EditForm()
     movie_api_id = request.args.get("id")
     new_movie_url = f"https://api.themoviedb.org/3/movie/{movie_api_id}"
     response = requests.get(new_movie_url, params={"api_key": API_KEY, "append_to_response": "title, poster_path, "
