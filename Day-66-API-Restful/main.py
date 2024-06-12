@@ -47,13 +47,26 @@ def home():
 
 
 # HTTP GET - Read Record
-@app.route("/random", methods=["GET"])
+@app.route("/random")
 def get_random_cafe():
     result = db.session.execute(db.select(Cafe))
     all_cafes = result.scalars().all()
     random_cafe = random.choice(all_cafes)
 
     return jsonify(cafe=random_cafe.cafes_dict())
+
+
+@app.route("/all")
+def get_all_cafes():
+    result = db.session.execute(db.select(Cafe))
+    all_cafes = result.scalars().all()
+    cafes = [cafe.cafes_dict() for cafe in all_cafes]
+    return jsonify(cafes=cafes)
+
+
+@app.route("/search")
+def search_cafe():
+    pass
 # HTTP POST - Create Record
 
 # HTTP PUT/PATCH - Update Record
