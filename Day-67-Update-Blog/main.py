@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -13,6 +13,7 @@ from datetime import date
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 Bootstrap5(app)
+ckeditor = CKEditor(app)
 
 # CREATE DATABASE
 
@@ -37,6 +38,15 @@ class BlogPost(db.Model):
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
 
+class AddPost(FlaskForm):
+    title = StringField('Blog Post Title', validators=[DataRequired()])
+    subtitle = StringField('Subtitle', validators=[DataRequired()])
+    name = StringField('Your Name', validators=[DataRequired()])
+    post_url = StringField('Blog Image URL', validators=[DataRequired(), URL()])
+    body = CKEditorField('Blog Content', validators=[DataRequired()])
+    submit = SubmitField('Submit Post')
+
+
 with app.app_context():
     db.create_all()
 
@@ -55,14 +65,32 @@ def show_post(post_id):
     requested_post = db.get_or_404(BlogPost, post_id)
     return render_template("post.html", post=requested_post)
 
-
 # TODO: add_new_post() to create a new blog post
 
+
+@app.route('/new-post', methods=["POST", "GET"])
+def add_new_post():
+    form = AddPost()
+    if form.validate_on_submit():
+        new_post = BlogPost(
+            title=request.form["title"],
+            subtitle=request.form["subtitle"],
+            author=request.form["name"],
+            img_url=request.form["post_url"],
+            body=request.form["body"],
+            date=date.today().strftime("%B %d, %Y")
+        )
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect(url_for('get_all_posts'))
+    return render_template("make-post.html", form=form)
 # TODO: edit_post() to change an existing blog post
 
 # TODO: delete_post() to remove a blog post from the database
 
 # Below is the code from previous lessons. No changes needed.
+
+
 @app.route("/about")
 def about():
     return render_template("about.html")
