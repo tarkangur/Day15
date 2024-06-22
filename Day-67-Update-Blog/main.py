@@ -65,9 +65,8 @@ def show_post(post_id):
     requested_post = db.get_or_404(BlogPost, post_id)
     return render_template("post.html", post=requested_post)
 
+
 # TODO: add_new_post() to create a new blog post
-
-
 @app.route('/new-post', methods=["POST", "GET"])
 def add_new_post():
     form = AddPost()
@@ -84,13 +83,31 @@ def add_new_post():
         db.session.commit()
         return redirect(url_for('get_all_posts'))
     return render_template("make-post.html", form=form)
+
+
 # TODO: edit_post() to change an existing blog post
-
-
 @app.route('/edit-post/<post_id>', methods=["POST", "GET"])
-def post_edit(post_id):
-    pass
+def edit_post(post_id):
+    form = AddPost()
+    post = db.get_or_404(BlogPost, post_id)
+    if form.validate_on_submit():
+        post.title = form.title.data
+        post.body = form.body.data
+        post.subtitle = form.subtitle.data
+        post.author = form.name.data
+        post.img_url = form.post_url.data
+        db.session.commit()
+        return redirect(url_for('get_all_posts'))
+    return render_template("make-post.html", form=form, is_edit=True)
+
+
 # TODO: delete_post() to remove a blog post from the database
+@app.route('/delete/<post_id>', methods=["DELETE", "GET"])
+def delete_post(post_id):
+    post = db.get_or_404(BlogPost, post_id)
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(url_for('get_all_posts'))
 
 # Below is the code from previous lessons. No changes needed.
 
