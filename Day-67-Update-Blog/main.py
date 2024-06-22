@@ -102,7 +102,7 @@ def edit_post(post_id):
 
 
 # TODO: delete_post() to remove a blog post from the database
-@app.route('/delete/<post_id>', methods=["DELETE", "GET"])
+@app.route('/delete/<post_id>')
 def delete_post(post_id):
     post = db.get_or_404(BlogPost, post_id)
     db.session.delete(post)
