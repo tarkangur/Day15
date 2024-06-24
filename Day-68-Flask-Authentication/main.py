@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
+from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -38,8 +38,18 @@ def home():
     return render_template("index.html")
 
 
-@app.route('/register')
+@app.route('/register', methods=["POST", "GET"])
 def register():
+    if request.method == "POST":
+        new_user = User(
+            email=request.form["email"],
+            password=request.form["password"],
+            name=request.form["name"]
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        session['name'] = request.form['name']
+        return redirect(url_for("secrets"))
     return render_template("register.html")
 
 
@@ -50,7 +60,8 @@ def login():
 
 @app.route('/secrets')
 def secrets():
-    return render_template("secrets.html")
+    name = session.get('name')
+    return render_template("secrets.html", name=name)
 
 
 @app.route('/logout')
@@ -58,9 +69,9 @@ def logout():
     pass
 
 
-@app.route('/download')
+@app.route('/download', methods=["GET"])
 def download():
-    pass
+    return send_from_directory('/static/files', 'cheat_sheet.pdf')
 
 
 if __name__ == "__main__":
