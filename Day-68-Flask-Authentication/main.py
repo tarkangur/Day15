@@ -19,6 +19,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
 # CREATE TABLE IN DB
 
 
@@ -41,15 +43,23 @@ def home():
 @app.route('/register', methods=["POST", "GET"])
 def register():
     if request.method == "POST":
+        hash_and_salted_password = generate_password_hash(
+            password=request.form["password"],
+            method='pbkdf2:sha256',
+            salt_length=8
+        )
         new_user = User(
             email=request.form["email"],
-            password=request.form["password"],
+            password=hash_and_salted_password,
             name=request.form["name"]
         )
+
         db.session.add(new_user)
         db.session.commit()
         session['name'] = request.form['name']
+
         return redirect(url_for("secrets"))
+
     return render_template("register.html")
 
 
