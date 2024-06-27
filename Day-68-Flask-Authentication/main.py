@@ -63,8 +63,19 @@ def register():
     return render_template("register.html")
 
 
-@app.route('/login')
+@app.route('/login', methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        email = request.form['email']
+        password = request.form["password"]
+        user = db.get_or_404(User, email)
+        check_password = check_password_hash(password=password, pwhash=user.password)
+        if  check_password:
+            login_user(user)
+            session['name'] = user.name
+
+            return redirect(url_for("secrets"))
+
     return render_template("login.html")
 
 
