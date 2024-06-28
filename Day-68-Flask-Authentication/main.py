@@ -69,8 +69,9 @@ def login():
         email = request.form['email']
         password = request.form["password"]
         user = db.get_or_404(User, email)
+        print(user)
         check_password = check_password_hash(password=password, pwhash=user.password)
-        if  check_password:
+        if check_password:
             login_user(user)
             session['name'] = user.name
 
@@ -80,6 +81,8 @@ def login():
 
 
 @app.route('/secrets')
+@login_manager.user_loader
+@login_required
 def secrets():
     name = session.get('name')
     return render_template("secrets.html", name=name)
@@ -91,6 +94,8 @@ def logout():
 
 
 @app.route('/download', methods=["GET"])
+@login_manager.user_loader
+@login_required
 def download():
     return send_from_directory(directory='static/files', path='cheat_sheet.pdf')
 
