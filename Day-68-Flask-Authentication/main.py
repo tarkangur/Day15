@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory, session
+from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -42,7 +42,7 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    return render_template("index.html")
+    return render_template("index.html", logged_in=current_user.is_authenticated)
 
 
 @app.route('/register', methods=["POST", "GET"])
@@ -52,7 +52,8 @@ def register():
         name = request.form["name"]
         password = request.form["password"]
         if User.query.filter_by(email=email).first():
-            flash('Email address already exists')
+            flash("You've already signed up with that email, log in instead!")
+            return redirect(url_for('login'))
         else:
             hash_and_salted_password = generate_password_hash(
                 password=password,
@@ -68,11 +69,10 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
-            session['name'] = request.form['name']
 
             return redirect(url_for("secrets"))
 
-    return render_template("register.html")
+    return render_template("register.html", logged_in=current_user.is_authenticated)
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -81,21 +81,24 @@ def login():
         email = request.form['email']
         password = request.form["password"]
         user = User.query.filter_by(email=email).first()
-        check_password = check_password_hash(password=password, pwhash=user.password)
-        if check_password:
-            login_user(user)
-            session['name'] = user.name
+        if user:
+            if check_password_hash(password=password, pwhash=user.password):
+                login_user(user)
 
-            return redirect(url_for("secrets"))
-
-    return render_template("login.html")
+                return redirect(url_for("secrets"))
+            else:
+                flash('Password incorrect. please try again.')
+                return redirect(url_for('login'))
+        else:
+            flash('That email does not exist, please try again.')
+            return redirect(url_for('login'))
+    return render_template("login.html", logged_in=current_user.is_authenticated)
 
 
 @app.route('/secrets')
 @login_required
 def secrets():
-    name = session.get('name')
-    return render_template("secrets.html", name=name)
+    return render_template("secrets.html", name=current_user.name, logged_in=True)
 
 
 @app.route('/logout')
