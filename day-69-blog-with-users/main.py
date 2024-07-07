@@ -47,6 +47,7 @@ class BlogPost(db.Model):
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
     author = relationship("User", back_populates="posts")
     author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"), nullable=False)
+    comments = relationship("Comment", back_populates="parent_post")
 
 
 # TODO: Create a User table for all your registered users.
@@ -63,9 +64,11 @@ class User(UserMixin, db.Model):
 class Comment(db.Model):
     __tablename__ = "comments"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    text: Mapped[str] = mapped_column(String(1000), nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
     author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
     comment_author = relationship("User", back_populates="comments")
+    post_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("blog_posts.id"))
+    parent_post = relationship("BlogPost", back_populates="comments")
 
 
 with app.app_context():
@@ -137,10 +140,23 @@ def get_all_posts():
 
 
 # TODO: Allow logged-in users to comment on posts
-@app.route("/post/<int:post_id>")
+@app.route("/post/<int:post_id>", methods=["GET", "POST"])
 def show_post(post_id):
     form = CommentForm()
     requested_post = db.get_or_404(BlogPost, post_id)
+    if form.validate_on_submit():
+        if current_user.is_authenticated:
+            new_comment = Comment(
+                text=form.comment_text.data,
+                post_id=post_id,
+                author_id=current_user.id
+            )
+            db.session.add(new_comment)
+            db.session.commit()
+            return redirect(url_for("show_post", post_id=post_id))
+        else:
+            flash("You need to login or register to comment.")
+            return redirect(url_for("login"))
     return render_template("post.html", post=requested_post, current_user=current_user, form=form)
 
 
