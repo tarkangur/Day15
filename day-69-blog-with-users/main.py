@@ -14,6 +14,14 @@ from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 ckeditor = CKEditor(app)
+gravatar = Gravatar(app,
+                    size=100,
+                    rating='g',
+                    default='retro',
+                    force_default=False,
+                    force_lower=False,
+                    use_ssl=False,
+                    base_url=None)
 Bootstrap5(app)
 
 # TODO: Configure Flask-Login
@@ -157,7 +165,7 @@ def show_post(post_id):
         else:
             flash("You need to login or register to comment.")
             return redirect(url_for("login"))
-    return render_template("post.html", post=requested_post, current_user=current_user, form=form)
+    return render_template("post.html", post=requested_post, current_user=current_user, form=form,)
 
 
 def admin_only(f):
